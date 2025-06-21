@@ -34,6 +34,7 @@
   --background: #dfdff0;
   --foreground: #171717;
   --yellow-300: #edff66;
+  --blue-50: #dfdff0;
   --font-robert-regular: 'robert-regular', sans-serif;
   --font-circular: 'circular-web', sans-serif;
   --font-general: 'general', sans-serif;
@@ -43,7 +44,7 @@
 
 @theme inline {
   /* Colors */
-  --color-blue-50: #dfdff0;
+  --color-blue-50: var(--blue-50);
   --color-blue-75: #dfdff2;
   --color-blue-100: #f0f2fa;
   --color-blue-200: #010101;
