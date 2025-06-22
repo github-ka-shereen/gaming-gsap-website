@@ -63,9 +63,20 @@
 
 body {
   width: 100dvw;
-  overflow-x: hidden;
   background-color: #dfdff0;
   font-family: var(--font-general);
+  scroll-behavior: smooth;
+  overflow-x: hidden; /* This keeps horizontal scrollbar hidden and prevents horizontal scrolling */
+
+  /* --- ADD THESE LINES TO HIDE THE VERTICAL SCROLLBAR --- */
+
+  /* For Webkit browsers (Chrome, Safari, new Edge) */
+  /* Target the scrollbar pseudo-element directly */
+  &::-webkit-scrollbar {
+    display: none; /* Hides the visual scrollbar */
+    width: 0; /* Ensures no space is reserved for the scrollbar */
+    background: transparent; /* Optional: makes scrollbar track transparent */
+  }
 }
 
 /* Custom utilities */
