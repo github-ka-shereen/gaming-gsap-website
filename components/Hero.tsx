@@ -105,7 +105,7 @@ const Hero = () => {
       // At least some data is available
       setLoadedVideos((prev) => {
         const newCount = prev + 1;
-        console.log(`Loaded ${newCount}/${totalVideos} videos`);
+        // console.log(`Loaded ${newCount}/${totalVideos} videos`);
         return newCount;
       });
     }
@@ -114,7 +114,7 @@ const Hero = () => {
   // Check when all videos are loaded
   useEffect(() => {
     if (loadedVideos >= totalVideos) {
-      console.log('ALL VIDEOS LOADED!');
+      // console.log('ALL VIDEOS LOADED!');
       setIsLoading(false); // Hide loading screen
     }
   }, [loadedVideos]); // Runs whenever loadedVideos changes
