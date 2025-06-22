@@ -6,6 +6,7 @@ import { TiLocationArrow } from 'react-icons/ti';
 import { clsx } from 'clsx';
 import { useWindowScroll } from 'react-use';
 import gsap from 'gsap';
+import Image from 'next/image';
 
 type NavItem = 'Nexus' | 'Vault' | 'Prologue' | 'About' | 'Contact';
 
@@ -103,7 +104,7 @@ const NavigationBar = () => {
         <nav className='flex size-full items-center justify-between p-4'>
           {/* Logo and Product button */}
           <div className='flex items-center gap-7'>
-            <img
+            <Image
               src='/img/logo.png'
               alt='logo'
               className='w-10'

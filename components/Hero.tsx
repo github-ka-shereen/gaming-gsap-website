@@ -157,7 +157,7 @@ const Hero = () => {
             loop
             muted
             id='next-video'
-            className='absolute-center invisible absolute z-20 size-64 object-cover object-center'
+            className='opacity-0 invisible absolute z-20 size-64 object-cover object-center transition-opacity duration-500'
             onLoadedData={handleVideoLoad}
           />
           <video
