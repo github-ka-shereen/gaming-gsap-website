@@ -1,19 +1,24 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Button from './Button';
 import { TiLocationArrow } from 'react-icons/ti';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/all';
 
-type Props = {};
+gsap.registerPlugin(ScrollTrigger);
 
-const Hero = (props: Props) => {
+const Hero = () => {
   const [currentIndex, setCurrentIndex] = useState(1);
   const [hasClicked, setHasClicked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadedVideos, setLoadedVideos] = useState(0);
+  // Cache busting solution for Next.js video loading
+  const [videoSuffix, setVideoSuffix] = useState(''); // Start with no cache-busting suffix
 
   const handleVideoLoad = () => {
+    console.log('Video loaded, count:', loadedVideos + 1);
+
     setLoadedVideos((prev) => prev + 1);
   };
 
@@ -63,10 +68,68 @@ const Hero = (props: Props) => {
     { dependencies: [currentIndex], revertOnUpdate: true }
   );
 
-  const getVideoSrc = (index: number | string) => `videos/hero-${index}.mp4`;
+  useGSAP(() => {
+    gsap.set('#video-frame', {
+      clipPath: 'polygon(14% 0%, 72% 0%, 90% 90%, 0% 100%)',
+    });
+
+    gsap.from('#video-frame', {
+      clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+      ease: 'power1.inOut',
+      scrollTrigger: {
+        trigger: '#video-frame',
+        start: 'center center',
+        end: 'bottom center',
+        scrub: true,
+      },
+    });
+  });
+
+  // Get video URL - adds cache-busting only on client
+  const getVideoSrc = (index: number | string) =>
+    `/videos/hero-${index}.mp4${videoSuffix}`; // Append suffix if exists
+
+  // This runs ONLY in the browser (after component mounts)
+  useEffect(() => {
+    // Add timestamp to URL to prevent caching
+    setVideoSuffix(`?ts=${Date.now()}`);
+  }, []); // Empty array = runs once on mount
+
+  // When a video becomes playable
+  const handleVideoReady = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.target as HTMLVideoElement;
+
+    // Video ready states:
+    // 0 = HAVE_NOTHING, 1 = HAVE_METADATA, 2 = HAVE_CURRENT_DATA, 3 = HAVE_FUTURE_DATA, 4 = HAVE_ENOUGH_DATA
+    if (video.readyState >= 3) {
+      // At least some data is available
+      setLoadedVideos((prev) => {
+        const newCount = prev + 1;
+        console.log(`Loaded ${newCount}/${totalVideos} videos`);
+        return newCount;
+      });
+    }
+  };
+
+  // Check when all videos are loaded
+  useEffect(() => {
+    if (loadedVideos >= totalVideos) {
+      console.log('ALL VIDEOS LOADED!');
+      setIsLoading(false); // Hide loading screen
+    }
+  }, [loadedVideos]); // Runs whenever loadedVideos changes
 
   return (
     <div className='relative h-dvh w-screen overflow-x-hidden'>
+      {isLoading && (
+        <div className='flex-center absolute z-[100] h-dvh w-screen overflow-hidden bg-violet-50'>
+          <div className='three-body'>
+            <div className='three-body__dot' />
+            <div className='three-body__dot' />
+            <div className='three-body__dot' />
+          </div>
+        </div>
+      )}
       <div
         id='video-frame'
         className='relative z-10 h-dvh w-screen overflow-hidden rounded-lg bg-blue-75'
@@ -104,8 +167,13 @@ const Hero = (props: Props) => {
             autoPlay
             loop
             muted
+            playsInline // Important for mobile
             className='absolute left-0 top-0 size-full object-cover object-center'
-            onLoadedData={handleVideoLoad}
+            onCanPlayThrough={handleVideoReady} // More reliable than onLoadedData
+            onLoadedData={handleVideoReady} // Fallback
+            onError={(e) =>
+              console.error('Video error:', e.currentTarget.error)
+            }
           />
         </div>
         <h1 className='special-font hero-heading absolute bottom-5 right-5 z-40 text-blue-75'>
